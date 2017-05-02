@@ -24,26 +24,41 @@ void setup()
 {
   Serial.begin(9600);
   pinMode(4, OUTPUT);
+  pinMode(2, INPUT);
   irrecv.enableIRIn(); // Start the receiver
     myservo.attach(9);
 }
 
 void loop() {
+   int button = digitalRead(2);
+  
+   if(button == LOW)
+      {
+        delay(300);
+      changePosition();
+      }
+      
+  
+  Serial.println(button);
+  
   if (irrecv.decode(&results)) {
     int valeur = getValue(results.value);
+   
     Serial.println(valeur);
     if(valeur == 10 ){
-      if(lampe)
+      changePosition();
+    } 
+    irrecv.resume();
+  }
+}
+
+void changePosition(){
+  if(lampe)
         posit = position_init;
       else posit = position_final;
       myservo.write(map(posit, 0, 1023,180, 90));
       lampe =!lampe;
        digitalWrite(4, lampe);
-    }
-     
-    irrecv.resume(); // Receive the next value
-  }
-  delay(100);
 }
 
 
